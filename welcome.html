@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>拍手找手机 - 欢迎引导</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .phone-container {
+            position: relative;
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 55px;
+            padding: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .phone-screen {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 45px;
+            overflow: hidden;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 30px;
+            background: #000;
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+            z-index: 10;
+        }
+
+        .status-bar {
+            position: relative;
+            height: 44px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 9;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .status-bar .time {
+            font-size: 16px;
+        }
+
+        .status-bar .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-bar .status-icons span {
+            font-size: 14px;
+        }
+
+        .status-bar .status-icons .battery {
+            width: 25px;
+            height: 12px;
+            border: 1px solid #fff;
+            border-radius: 3px;
+            position: relative;
+            margin-left: 5px;
+        }
+
+        .status-bar .status-icons .battery::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 6px;
+            background: #fff;
+            right: -4px;
+            top: 3px;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .status-bar .status-icons .battery::before {
+            content: '';
+            position: absolute;
+            width: 65%;
+            height: 8px;
+            background: #fff;
+            left: 1px;
+            top: 1px;
+            border-radius: 1px;
+        }
+
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 5px;
+            background: #fff;
+            border-radius: 3px;
+            z-index: 10;
+        }
+
+        .app-content {
+            position: relative;
+            height: calc(100% - 44px);
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slider-container {
+            position: relative;
+            width: 100%;
+            flex-grow: 1;
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 30px 20px;
+            background: linear-gradient(160deg, #102542, #0d1d36);
+        }
+
+        .slide-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            max-width: 280px;
+            margin-bottom: 20px;
+        }
+
+        .app-logo {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 80px;
+        }
+
+        .app-logo img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .slide h1 {
+            color: #fff;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .slide p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .indicators {
+            display: flex;
+            gap: 8px;
+            margin: 30px 0;
+            justify-content: center;
+        }
+
+        .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .indicator.active {
+            width: 24px;
+            border-radius: 4px;
+            background: #fff;
+        }
+
+        .btn {
+            background: #4A90E2;
+            color: #fff;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            box-shadow: 0 10px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .auth-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+        }
+
+        @keyframes pulse {
+            0% {transform: scale(1);}
+            50% {transform: scale(1.1);}
+            100% {transform: scale(1);}
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .illustration {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 85px;
+        }
+        
+        /* 特别为多种提醒方式页面添加样式 */
+        .notification-icons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+        
+        .notification-icons span {
+            font-size: 60px;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+            <div class="status-bar">
+                <div class="time">12:00</div>
+                <div class="status-icons">
+                    <span aria-hidden="true">📶</span>
+                    <span aria-hidden="true">📡</span>
+                    <div class="battery" role="img" aria-label="电池电量"></div>
+                </div>
+            </div>
+            <div class="app-content">
+                <div class="slider-container">
+                    <!-- 欢迎页 -->
+                    <div class="slide">
+                        <div class="slide-content">
+                            <div class="app-logo">
+                                🔊
+                            </div>
+                            <h1>拍手找手机</h1>
+                            <p>再也不用担心找不到手机了，只需要拍拍手，就能轻松定位！</p>
+                        </div>
+                    </div>
+
+                    <!-- 功能介绍 1 -->
+                    <div class="slide">
+                        <div class="slide-content">
+                            <div class="illustration">
+                                👏👂
+                            </div>
+                            <h1>智能声音识别</h1>
+                            <p>我们的应用可以智能识别拍手声音，即使在嘈杂的环境中也能准确捕捉信号</p>
+                        </div>
+                    </div>
+
+                    <!-- 功能介绍 2 -->
+                    <div class="slide">
+                        <div class="slide-content">
+                            <div class="notification-icons">
+                                <span>📳</span>
+                                <span>💡</span>
+                                <span>🔔</span>
+                            </div>
+                            <h1>多种提醒方式</h1>
+                            <p>铃声、震动、闪光灯多种提醒方式，即使在静音模式下也能轻松找到手机</p>
+                        </div>
+                    </div>
+
+                    <!-- 麦克风权限 -->
+                    <div class="slide">
+                        <div class="slide-content">
+                            <div class="auth-icon pulse">
+                                🎤
+                            </div>
+                            <h1>授权麦克风</h1>
+                            <p>我们需要麦克风权限来识别拍手声音。您的隐私将受到严格保护，我们不会记录或存储任何声音数据。</p>
+                            <button class="btn" id="start-btn">开始使用</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 统一的指示器组件，从各个页面提取出来 -->
+                <div class="indicators">
+                    <div class="indicator active"></div>
+                    <div class="indicator"></div>
+                    <div class="indicator"></div>
+                    <div class="indicator"></div>
+                </div>
+            </div>
+            <div class="home-indicator"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sliderContainer = document.querySelector('.slider-container');
+            const slides = document.querySelectorAll('.slide');
+            const indicators = document.querySelectorAll('.indicator');
+            const startBtn = document.getElementById('start-btn');
+            
+            let currentSlide = 0;
+            const slideWidth = 100; // percentage
+            
+            // 触摸事件变量
+            let startX, endX;
+            const threshold = 50; // 最小滑动距离
+            
+            // 更新指示器
+            function updateIndicators() {
+                indicators.forEach((indicator, index) => {
+                    if (index === currentSlide) {
+                        indicator.classList.add('active');
+                    } else {
+                        indicator.classList.remove('active');
+                    }
+                });
+            }
+            
+            // 切换到指定幻灯片
+            function goToSlide(index) {
+                if (index < 0) {
+                    index = 0;
+                } else if (index >= slides.length) {
+                    index = slides.length - 1;
+                }
+                
+                currentSlide = index;
+                sliderContainer.style.transform = `translateX(-${slideWidth * currentSlide}%)`;
+                updateIndicators();
+            }
+            
+            // 初始化 - 确保指示器状态正确
+            updateIndicators();
+            
+            // 触摸事件处理
+            sliderContainer.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+            });
+            
+            sliderContainer.addEventListener('touchend', function(e) {
+                endX = e.changedTouches[0].clientX;
+                
+                const diff = startX - endX;
+                
+                if (Math.abs(diff) >= threshold) {
+                    if (diff > 0) {
+                        // 向左滑动，前进
+                        goToSlide(currentSlide + 1);
+                    } else {
+                        // 向右滑动，后退
+                        goToSlide(currentSlide - 1);
+                    }
+                }
+            });
+            
+            // 点击指示器切换幻灯片
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', function() {
+                    goToSlide(index);
+                });
+            });
+            
+            // 添加鼠标事件以支持桌面端测试
+            sliderContainer.addEventListener('mousedown', function(e) {
+                if (e && e.clientX) {
+                    startX = e.clientX;
+                    e.preventDefault();
+                }
+            });
+            
+            sliderContainer.addEventListener('mouseup', function(e) {
+                if (e && e.clientX && typeof startX !== 'undefined') {
+                    endX = e.clientX;
+                    
+                    const diff = startX - endX;
+                    
+                    if (Math.abs(diff) >= threshold) {
+                        if (diff > 0) {
+                            // 向左滑动，前进
+                            goToSlide(currentSlide + 1);
+                        } else {
+                            // 向右滑动，后退
+                            goToSlide(currentSlide - 1);
+                        }
+                    }
+                }
+            });
+            
+            // 开始使用按钮点击事件
+            startBtn.addEventListener('click', function() {
+                // 模拟请求麦克风权限
+                alert('请授权麦克风权限以使用拍手找手机功能');
+                
+                // 在实际应用中，这里应该请求麦克风权限
+                // navigator.mediaDevices.getUserMedia({ audio: true })
+                //     .then(function(stream) {
+                //         // 权限获取成功，跳转到主页
+                //         window.location.href = 'home.html';
+                //     })
+                //     .catch(function(err) {
+                //         // 权限获取失败，显示提示
+                //         console.error('无法获取麦克风权限: ', err);
+                //         alert('需要麦克风权限才能使用拍手找手机功能');
+                //     });
+                
+                // 模拟跳转到主页面
+                setTimeout(function() {
+                    // 实际应用中应该导航到主页面
+                    console.log('跳转到主页');
+                    alert('即将跳转到应用主页');
+                    // window.location.href = 'home.html';
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html> 
