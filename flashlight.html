@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>拍手找手机 - 闪光灯设置</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .phone-container {
+            position: relative;
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 55px;
+            padding: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .phone-screen {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 45px;
+            overflow: hidden;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 30px;
+            background: #000;
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+            z-index: 10;
+        }
+
+        .status-bar {
+            position: relative;
+            height: 44px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 9;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .status-bar .time {
+            font-size: 16px;
+        }
+
+        .status-bar .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-bar .status-icons span {
+            font-size: 14px;
+        }
+
+        .status-bar .status-icons .battery {
+            width: 25px;
+            height: 12px;
+            border: 1px solid #fff;
+            border-radius: 3px;
+            position: relative;
+            margin-left: 5px;
+        }
+
+        .status-bar .status-icons .battery::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 6px;
+            background: #fff;
+            right: -4px;
+            top: 3px;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .status-bar .status-icons .battery::before {
+            content: '';
+            position: absolute;
+            width: 65%;
+            height: 8px;
+            background: #fff;
+            left: 1px;
+            top: 1px;
+            border-radius: 1px;
+        }
+
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 5px;
+            background: #fff;
+            border-radius: 3px;
+            z-index: 10;
+        }
+
+        .app-content {
+            position: relative;
+            height: calc(100% - 44px);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(160deg, #0a1a2e 0%, #1e1a40 50%, #2a1145 100%);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .slider-section {
+            margin: 15px 0;
+            padding: 25px 20px;
+            background: rgba(16, 37, 66, 0.8);
+        }
+
+        .slider-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .slider-title .icon {
+            width: 24px;
+            height: 24px;
+            background: #FFD54F;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            color: #0a1a2e;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(255, 213, 79, 0.4);
+        }
+
+        .slider-title .text {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .slider-value {
+            color: #4BE1D3;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .slider-container {
+            position: relative;
+            height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            position: relative;
+        }
+
+        .slider-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: #4BE1D3;
+            border-radius: 3px;
+        }
+
+        .slider-thumb {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .slider-thumb::before {
+            content: '<>';
+            font-size: 12px;
+            color: #0a1a2e;
+            transform: rotate(90deg);
+            letter-spacing: -2px;
+            font-weight: bold;
+        }
+
+        .test-button {
+            margin: 25px 20px;
+            height: 55px;
+            background: #00E676;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #003a1e;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .test-button:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(0, 230, 118, 0.3);
+        }
+
+        .nav-bar {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            padding-bottom: 20px;
+            margin-bottom: 0;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            width: 20%;
+            padding-top: 8px;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 3px;
+            color: #666;
+        }
+
+        .nav-text {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .nav-item.active .nav-icon,
+        .nav-item.active .nav-text {
+            color: #4A90E2;
+            text-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+            <div class="status-bar">
+                <div class="time">12:00</div>
+                <div class="status-icons">
+                    <span aria-hidden="true">📶</span>
+                    <span aria-hidden="true">📡</span>
+                    <div class="battery" role="img" aria-label="电池电量"></div>
+                </div>
+            </div>
+            <div class="app-content">
+                <div class="header">
+                    <h1>闪光灯设置</h1>
+                </div>
+                
+                <div class="slider-section">
+                    <div class="slider-title">
+                        <div class="icon">💡</div>
+                        <div class="text">开启灯光时间</div>
+                    </div>
+                    <div class="slider-value" id="onTimeValue">0.2s</div>
+                    <div class="slider-container">
+                        <div class="slider" id="onTimeSlider">
+                            <div class="slider-fill" style="width: 20%;"></div>
+                            <div class="slider-thumb" style="left: 20%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slider-section">
+                    <div class="slider-title">
+                        <div class="icon">💡</div>
+                        <div class="text">关闭灯光时间</div>
+                    </div>
+                    <div class="slider-value" id="offTimeValue">0.3s</div>
+                    <div class="slider-container">
+                        <div class="slider" id="offTimeSlider">
+                            <div class="slider-fill" style="width: 30%;"></div>
+                            <div class="slider-thumb" style="left: 30%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-button" id="testButton">测试</div>
+            </div>
+            
+            <div class="nav-bar">
+                <a href="home.html" class="nav-item">
+                    <div class="nav-icon">📱</div>
+                    <div class="nav-text">找手机</div>
+                </a>
+                <a href="ringtone.html" class="nav-item">
+                    <div class="nav-icon">🔔</div>
+                    <div class="nav-text">铃声</div>
+                </a>
+                <a href="sound.html" class="nav-item">
+                    <div class="nav-icon">🔊</div>
+                    <div class="nav-text">声音</div>
+                </a>
+                <a href="flashlight.html" class="nav-item active">
+                    <div class="nav-icon">💡</div>
+                    <div class="nav-text">闪光灯</div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-text">我的</div>
+                </a>
+            </div>
+            <div class="home-indicator"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取滑块元素
+            const onTimeSlider = document.getElementById('onTimeSlider');
+            const offTimeSlider = document.getElementById('offTimeSlider');
+            const onTimeValue = document.getElementById('onTimeValue');
+            const offTimeValue = document.getElementById('offTimeValue');
+            const testButton = document.getElementById('testButton');
+            
+            // 开启时间滑块初始值
+            let onTimePercent = 20;
+            let onTime = 0.2;
+            
+            // 关闭时间滑块初始值
+            let offTimePercent = 30;
+            let offTime = 0.3;
+            
+            // 滑块拖动实现
+            function setupSlider(slider, valueElement, initialPercent, unit, minValue, maxValue) {
+                const sliderFill = slider.querySelector('.slider-fill');
+                const sliderThumb = slider.querySelector('.slider-thumb');
+                let isDragging = false;
+                
+                // 更新滑块值的函数
+                function updateValue(percent) {
+                    const value = minValue + (percent / 100) * (maxValue - minValue);
+                    valueElement.textContent = value.toFixed(1) + unit;
+                    return value;
+                }
+                
+                // 更新滑块位置的函数
+                function updateSlider(percent) {
+                    sliderFill.style.width = `${percent}%`;
+                    sliderThumb.style.left = `${percent}%`;
+                    return updateValue(percent);
+                }
+                
+                // 初始化滑块
+                let currentValue = updateValue(initialPercent);
+                
+                // 鼠标/触摸事件处理
+                function handleSliderMove(e) {
+                    if (!isDragging) return;
+                    
+                    const rect = slider.getBoundingClientRect();
+                    let clientX = e.clientX;
+                    
+                    // 触摸设备支持
+                    if (e.type.startsWith('touch')) {
+                        clientX = e.touches[0].clientX;
+                    }
+                    
+                    // 计算百分比
+                    let percent = ((clientX - rect.left) / rect.width) * 100;
+                    percent = Math.max(0, Math.min(100, percent));
+                    
+                    // 更新滑块和值
+                    currentValue = updateSlider(percent);
+                    return percent;
+                }
+                
+                // 按下事件
+                slider.addEventListener('mousedown', function(e) {
+                    isDragging = true;
+                    return handleSliderMove(e);
+                });
+                
+                slider.addEventListener('touchstart', function(e) {
+                    isDragging = true;
+                    return handleSliderMove(e);
+                });
+                
+                // 移动事件
+                document.addEventListener('mousemove', function(e) {
+                    if (isDragging) {
+                        const percent = handleSliderMove(e);
+                        
+                        // 更新对应的时间值
+                        if (slider.id === 'onTimeSlider') {
+                            onTimePercent = percent;
+                            onTime = currentValue;
+                        } else if (slider.id === 'offTimeSlider') {
+                            offTimePercent = percent;
+                            offTime = currentValue;
+                        }
+                    }
+                });
+                
+                document.addEventListener('touchmove', function(e) {
+                    if (isDragging) {
+                        const percent = handleSliderMove(e);
+                        
+                        // 更新对应的时间值
+                        if (slider.id === 'onTimeSlider') {
+                            onTimePercent = percent;
+                            onTime = currentValue;
+                        } else if (slider.id === 'offTimeSlider') {
+                            offTimePercent = percent;
+                            offTime = currentValue;
+                        }
+                    }
+                });
+                
+                // 释放事件
+                document.addEventListener('mouseup', function() {
+                    isDragging = false;
+                });
+                
+                document.addEventListener('touchend', function() {
+                    isDragging = false;
+                });
+                
+                return { updateSlider };
+            }
+            
+            // 设置两个滑块
+            const onSlider = setupSlider(onTimeSlider, onTimeValue, onTimePercent, 's', 0, 1);
+            const offSlider = setupSlider(offTimeSlider, offTimeValue, offTimePercent, 's', 0, 1);
+            
+            // 测试按钮点击事件
+            testButton.addEventListener('click', function() {
+                console.log(`测试闪光灯: 开启时间 ${onTime.toFixed(1)}s, 关闭时间 ${offTime.toFixed(1)}s`);
+                
+                // 模拟闪光灯效果 (仅为演示)
+                const screen = document.querySelector('.phone-screen');
+                testFlash(screen, 5);
+            });
+            
+            // 模拟闪烁效果
+            function testFlash(element, count) {
+                let flashCount = 0;
+                
+                function flash() {
+                    if (flashCount >= count * 2) {
+                        element.style.backgroundColor = '#000';
+                        testButton.textContent = '测试';
+                        testButton.style.background = '#00E676';
+                        return;
+                    }
+                    
+                    if (flashCount % 2 === 0) {
+                        element.style.backgroundColor = '#fff';
+                        setTimeout(flash, onTime * 1000);
+                    } else {
+                        element.style.backgroundColor = '#000';
+                        setTimeout(flash, offTime * 1000);
+                    }
+                    
+                    flashCount++;
+                }
+                
+                testButton.textContent = '测试中...';
+                testButton.style.background = '#8bc34a';
+                flash();
+            }
+            
+            // 导航栏点击事件
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(function(item) {
+                item.addEventListener('click', function(e) {
+                    // 获取点击项的导航文本
+                    const pageName = this.querySelector('.nav-text').textContent;
+                    
+                    // 如果点击的是导航项且有href属性不为#，则不阻止默认行为
+                    if (this.getAttribute('href') && this.getAttribute('href') !== '#') {
+                        // 允许链接跳转，不执行preventDefault
+                        console.log('正在跳转到页面: ' + pageName);
+                        return;
+                    }
+                    
+                    // 对于没有实际链接的导航项，阻止默认行为
+                    e.preventDefault();
+                    
+                    // 移除所有激活状态
+                    navItems.forEach(function(navItem) {
+                        navItem.classList.remove('active');
+                    });
+                    
+                    // 添加当前项的激活状态
+                    this.classList.add('active');
+                    
+                    console.log('切换到页面: ' + pageName);
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
